@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BEMHES CLIENTE — Portal de Cadastros</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Oswald:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+:root{--cream:#F7F3EA;--cream2:#ECE5D5;--orange:#D9531E;--blue:#1E4863;--dark:#1C2226;--amber:#E08E2B}
+body{background-color:var(--cream);background-image:radial-gradient(#d8cfbc 1px,transparent 1px);background-size:24px 24px;color:var(--dark);font-family:Inter,sans-serif}
+.display{font-family:Oswald,sans-serif}.industrial{border-bottom:6px solid var(--blue);transition:.2s}
+</style></head>
+<body class="min-h-screen flex flex-col">
+<header class="w-full bg-[#1C2226] text-white shadow-lg border-b-4 border-[#D9531E]">
+<div class="bg-[#1E4863]/90 border-b border-white/10"><div class="max-w-6xl mx-auto px-4 py-2 flex flex-wrap justify-between gap-2 text-xs sm:text-sm">
+<div class="font-medium flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-[#E08E2B] animate-pulse"></span>BEMHES 2027 — Soluções em Lubrificação Industrial, Agrícola e Automotiva</div>
+<div class="flex items-center gap-3"><span id="dateNow"></span><span class="px-2 py-1 rounded bg-black/30 text-amber-300">Portal de Cadastros</span></div></div>
+<div class="bg-[#F7F3EA] text-[#1C2226] py-5 px-4"><div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center gap-5">
+<div class="rounded-xl border bg-white p-1 shadow"><img src="MARCAO DA GRAXA.jpg" alt="Marcão da Graxa" width="88" onerror="this.onerror=null;this.src='https://placehold.co/180x180/F7F3EA/1C2226?text=Bemhes';"></div>
+<div class="flex-1 text-center md:text-left"><h1 class="display text-3xl sm:text-4xl font-bold">BEMHES <span class="text-[#D9531E]">CLIENTE</span></h1><p class="text-[#1C2226]/75">Lubrificantes e Manutenção Especializada — Linha Pesada, Agrícola e Industrial.</p></div>
+<a href="index.html" class="rounded-lg bg-[#944b20] px-5 py-3 text-white font-semibold hover:bg-[#783b19]">← Voltar</a>
+</div></div></header>
+<main class="max-w-6xl w-full mx-auto px-4 py-7 flex-1">
+<section class="mb-5 border-b-2 border-slate-900/10 pb-4 flex flex-wrap items-center justify-between gap-3">
+<div><h2 class="display text-2xl uppercase font-bold text-[#1E4863]">Gestão de Cadastros Relacionados</h2><p class="text-sm text-slate-600">Dados lidos e gravados diretamente nas abas da planilha conectada ao Apps Script.</p></div>
+<button onclick="reloadData()" class="px-4 py-2 rounded-xl bg-[#ECE5D5] border hover:bg-slate-800 hover:text-white">⟳ Sincronizar</button>
+</section>
+<section class="mb-5 rounded-2xl bg-white border-2 border-slate-900/10 shadow p-4">
+<h3 class="display text-lg font-bold mb-2">Relacionamentos (conforme diagrama enviado)</h3>
+<div class="text-xs sm:text-sm text-slate-700 flex flex-wrap gap-2 items-center">
+<span class="px-3 py-2 rounded bg-blue-100 font-bold">CLIENTES</span><span>↔</span>
+<span class="px-3 py-2 rounded bg-orange-100">MUNICIPIO</span><span>•</span>
+<span class="px-3 py-2 rounded bg-orange-100">Código de Industria</span><span>•</span>
+<span class="px-3 py-2 rounded bg-orange-100">Endereço Cobrança</span><span>•</span>
+<span class="px-3 py-2 rounded bg-orange-100">Endereço Entrega</span><span>•</span>
+<span class="px-3 py-2 rounded bg-orange-100">GRUPO FAMILIAR</span><span>•</span>
+<span class="px-3 py-2 rounded bg-orange-100">USUÁRIO</span><span>•</span>
+<span class="px-3 py-2 rounded bg-orange-100">COMPRADOR</span></div>
+<p class="mt-2 text-xs text-slate-500">Campos de vínculo serão exibidos como seleção quando os cabeçalhos da aba indicarem cliente, município, grupo, comprador ou usuário.</p></section>
+<div class="flex flex-wrap gap-2 mb-4" id="tabs"></div>
+<section class="bg-white rounded-2xl border-2 border-slate-900/10 shadow-lg industrial overflow-hidden">
+<div class="p-4 sm:p-5 bg-white border-b flex flex-col md:flex-row gap-3 justify-between items-center">
+<div><h3 id="pageTitle" class="display text-xl sm:text-2xl font-bold text-[#1E4863]"></h3><p id="pageInfo" class="text-sm text-slate-500">Cadastros</p></div>
+<div class="flex gap-2 w-full md:w-auto"><input id="search" oninput="renderTable()" placeholder="Pesquisar..." class="flex-1 md:w-64 px-3 py-2 border rounded-lg"><button onclick="openForm()" class="bg-[#D9531E] text-white rounded-lg px-4 py-2 font-bold whitespace-nowrap">+ Novo</button></div></div>
+<div id="status" class="p-4 text-sm text-blue-800 bg-blue-50">Carregando registros...</div>
+<div class="overflow-auto"><table class="w-full text-left text-sm"><thead id="thead" class="bg-[#1C2226] text-white"></thead><tbody id="tbody" class="divide-y"></tbody></table></div>
+<div id="empty" class="hidden p-10 text-center text-slate-500">Nenhum registro encontrado.</div></section>
+</main>
+<footer class="bg-[#1C2226] text-[#F7F3EA] border-t-4 border-[#D9531E] mt-auto"><div class="max-w-6xl mx-auto px-4 py-7">
+<div class="flex flex-col md:flex-row justify-between gap-4"><div><div class="display font-bold text-xl">BEMHES 2027</div><p class="text-sm text-white/70">Lubrificantes e Manutenção Especializada — Linha Pesada, Agrícola e Industrial.</p></div><div class="text-sm text-white/70 flex gap-4 flex-wrap"><span>Atendimento Técnico & Comercial</span><span>Qualidade Garantida</span></div></div>
+<div class="border-t border-white/10 mt-5 pt-4 flex justify-between text-xs text-white/50"><span>© <span id="year"></span> BEMHES 2027. Todos os direitos reservados.</span><span>Portal Administrativo • CRUD Google Sheets</span></div></div></footer>
+<div id="modal" class="hidden fixed inset-0 z-40 bg-black/60 backdrop-blur-sm p-4 overflow-auto items-center justify-center"><div class="bg-[#F7F3EA] rounded-2xl max-w-3xl w-full p-5 shadow-xl"><div class="flex justify-between items-center mb-4"><h3 id="modalTitle" class="display text-xl font-bold">Registro</h3><button onclick="closeForm()" class="text-xl">×</button></div><form id="form" onsubmit="saveForm(event)"><div id="fields" class="grid sm:grid-cols-2 gap-3 max-h-[65vh] overflow-auto pr-1"></div><div class="mt-5 flex justify-end gap-2"><button type="button" onclick="closeForm()" class="px-4 py-2 rounded border">Cancelar</button><button class="px-5 py-2 rounded bg-[#D9531E] text-white font-bold">Salvar</button></div></form></div></div>
+<div id="toast" class="fixed bottom-4 right-4 bg-[#1C2226] text-white p-3 rounded-lg shadow hidden"></div>
+<script>
+const SHEETS=['MUNICIPIO','Código de Industria','CLIENTES','Clientes Endereço Cobrança','Clientes Endereço Entrega','GRUPO FAMILIAR','USUÁRIO','COMPRADOR'];
+let data={}, active=SHEETS[2], editing=null;
+document.getElementById('dateNow').textContent=new Date().toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+document.getElementById('year').textContent=new Date().getFullYear();
+function norm(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()}
+function safe(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function call(fn,args,success,fail){google.script.run.withSuccessHandler(success).withFailureHandler(e=>{status(e.message||e);if(fail)fail(e)})[fn](...args)}
+function reloadData(){status('Sincronizando com a planilha...');call('portalListarAbas',[],r=>{data={};r.forEach(s=>data[s.nome]=s);makeTabs();renderTable();status('Sincronização concluída.');})}
+function status(msg){document.getElementById('status').textContent=msg}
+function makeTabs(){document.getElementById('tabs').innerHTML=SHEETS.map(s=>`<button onclick="setTab('${safe(s)}')" class="px-3 py-2 rounded-lg text-sm font-bold border ${s===active?'bg-[#1E4863] text-white':'bg-white text-slate-700 hover:bg-[#ECE5D5]'}">${safe(s)} <span class="opacity-70">(${(data[s]?.registros||[]).length})</span></button>`).join('')}
+function setTab(s){active=s;document.getElementById('search').value='';makeTabs();renderTable()}
+function renderTable(){const sh=data[active]||{colunas:[],registros:[],existe:false};document.getElementById('pageTitle').textContent=active;document.getElementById('pageInfo').textContent=sh.existe?`${sh.registros.length} registro(s) • ${sh.colunas.length} coluna(s)`:'A aba não existe na planilha.';const cols=sh.colunas||[];const query=norm(document.getElementById('search').value);const rows=(sh.registros||[]).filter(r=>!query||cols.some(c=>norm(r[c]).includes(query)));document.getElementById('thead').innerHTML='<tr>'+cols.map(c=>`<th class="px-3 py-3 whitespace-nowrap">${safe(c)}</th>`).join('')+'<th class="px-3 py-3">Ações</th></tr>';document.getElementById('tbody').innerHTML=rows.map(r=>`<tr class="hover:bg-orange-50">${cols.map(c=>`<td class="px-3 py-3 whitespace-nowrap">${safe(r[c])}</td>`).join('')}<td class="px-3 py-2 whitespace-nowrap"><button class="text-blue-700 font-bold mr-2" onclick="openForm(${r.__row})">Editar</button><button class="text-red-600 font-bold" onclick="removeRow(${r.__row})">Excluir</button></td></tr>`).join('');document.getElementById('empty').classList.toggle('hidden',rows.length>0);document.getElementById('tbody').parentElement.classList.toggle('hidden',rows.length===0)}
+function openForm(rowNum=null){const sh=data[active];if(!sh||!sh.existe){toast('A aba precisa existir primeiro.');return}editing=rowNum;const record=rowNum?sh.registros.find(r=>r.__row===rowNum):{};document.getElementById('modalTitle').textContent=rowNum?'Editar '+active:'Novo registro — '+active;document.getElementById('fields').innerHTML=sh.colunas.map((c,i)=>{if(i===0&&norm(c)==='id'&&!rowNum)return `<label class="block"><span class="text-xs font-semibold">${safe(c)} (automático se preenchido)</span><input name="${safe(c)}" value="" class="w-full p-2 border rounded mt-1"></label>`;const choices=relatedOptions(c);if(choices.length){return `<label class="block"><span class="text-xs font-semibold">${safe(c)}</span><select name="${safe(c)}" class="w-full p-2 border rounded mt-1"><option value="">Selecione…</option>${choices.map(v=>`<option ${String(record?.[c]||'')===v?'selected':''}>${safe(v)}</option>`).join('')}</select></label>`}return `<label class="block"><span class="text-xs font-semibold">${safe(c)}</span><input name="${safe(c)}" value="${safe(record?.[c]||'')}" class="w-full p-2 border rounded mt-1" ${norm(c)==='id'&&rowNum?'readonly':''}></label>`}).join('');document.getElementById('modal').classList.remove('hidden');document.getElementById('modal').classList.add('flex')}
+function relatedOptions(col){const n=norm(col);let source=null; if(n.includes('municip')||n==='cidade')source='MUNICIPIO';else if(n.includes('grupo familiar'))source='GRUPO FAMILIAR';else if(n.includes('comprador'))source='COMPRADOR';else if(n.includes('usuario')||n.includes('usuário'))source='USUÁRIO';else if(n.includes('industr')||n.includes('cod de ind')||n.includes('cod. de ind'))source='Código de Industria';else if(n.includes('cliente')||n.includes('codigo do cliente')||n.includes('cod cliente'))source='CLIENTES';if(!source||source===active)return[];const other=data[source];if(!other?.registros)return[];const cols=other.colunas||[];const preferred=cols.find(c=>norm(c).includes('nome'))||cols.find(c=>norm(c).includes('descr'))||cols.find(c=>norm(c).includes('municip'))||cols.find(c=>norm(c)==='id')||cols[0];return [...new Set(other.registros.map(r=>String(r[preferred]||'').trim()).filter(Boolean))]}
+function closeForm(){document.getElementById('modal').classList.add('hidden');document.getElementById('modal').classList.remove('flex')}
+function saveForm(e){e.preventDefault();const sh=data[active],obj={};new FormData(e.target).forEach((v,k)=>obj[k]=v);status('Salvando…');call('portalSalvar',[active,obj,editing],r=>{closeForm();toast(r.mensagem);reloadData()})}
+function removeRow(row){const item=data[active].registros.find(r=>r.__row===row);if(!confirm(`Excluir registro da aba "${active}"? ${item?Object.values(item).filter(v=>v).slice(0,3).join(' — '):''}`))return;call('portalExcluir',[active,row],r=>{toast(r.mensagem);reloadData()})}
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.remove('hidden');setTimeout(()=>el.classList.add('hidden'),2800)}
+reloadData();lucide?.createIcons?.();
+</script></body></html>
