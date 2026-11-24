@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html lang="pt-BR"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="pt-BR">
+    <head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>BEMHES CLIENTE — Portal de Cadastros</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -59,7 +61,7 @@ document.getElementById('dateNow').textContent=new Date().toLocaleDateString('pt
 document.getElementById('year').textContent=new Date().getFullYear();
 function norm(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim()}
 function safe(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function call(fn,args,success,fail){google.script.run.withSuccessHandler(success).withFailureHandler(e=>{status(e.message||e);if(fail)fail(e)})[fn](...args)}
+// NOVO CÓDIGO (cole o link da implantação /exec abaixo) const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxySKP12H6ww9H3FxTtpC99bykHUNaBsVuOYZlPWhXMK814cdyZ3mhYlAhpw9AA48Xg_Q/exec';  function call(fn, args, success, fail) {   fetch(SCRIPT_URL, {     method: 'POST',     body: JSON.stringify({ action: fn, args: args })   })   .then(res => res.json())   .then(data => {     if (data.erro) throw new Error(data.erro);     success(data);   })   .catch(e => {     status(e.message || e);     if (fail) fail(e);   }); }
 function reloadData(){status('Sincronizando com a planilha...');call('portalListarAbas',[],r=>{data={};r.forEach(s=>data[s.nome]=s);makeTabs();renderTable();status('Sincronização concluída.');})}
 function status(msg){document.getElementById('status').textContent=msg}
 function makeTabs(){document.getElementById('tabs').innerHTML=SHEETS.map(s=>`<button onclick="setTab('${safe(s)}')" class="px-3 py-2 rounded-lg text-sm font-bold border ${s===active?'bg-[#1E4863] text-white':'bg-white text-slate-700 hover:bg-[#ECE5D5]'}">${safe(s)} <span class="opacity-70">(${(data[s]?.registros||[]).length})</span></button>`).join('')}
@@ -72,4 +74,6 @@ function saveForm(e){e.preventDefault();const sh=data[active],obj={};new FormDat
 function removeRow(row){const item=data[active].registros.find(r=>r.__row===row);if(!confirm(`Excluir registro da aba "${active}"? ${item?Object.values(item).filter(v=>v).slice(0,3).join(' — '):''}`))return;call('portalExcluir',[active,row],r=>{toast(r.mensagem);reloadData()})}
 function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.remove('hidden');setTimeout(()=>el.classList.add('hidden'),2800)}
 reloadData();lucide?.createIcons?.();
-</script></body></html>
+</script>
+</body>
+</html>
